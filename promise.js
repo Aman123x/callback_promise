@@ -1,44 +1,48 @@
-const posts =[
-    {title:'Post One', body:"This is post one"},
-    {title:"Post two", body:"This is post two"}
+
+const posts = [
+    { title: 'Post One', body: "This is post one" },
+    { title: "Post Two", body: "This is post two" }
 ];
 
-function getPosts(){
-    setTimeout(()=>{
-        let output="";
-        posts.forEach((post,index)=>{
-            output+=`<li>${post.title}</li>`
+let lastActivityTime = "";
+
+function getPosts() {
+    setTimeout(() => {
+        let output = "";
+        posts.forEach((post, index) => {
+            output += `<li>${post.title} - Last Activity Time: ${lastActivityTime}</li>`;
         });
-        document.body.innerHTML=output;
-    },1000);
+        document.body.innerHTML = output;
+    }, 1000);
 }
 
-function createPost(post){
-    return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
-            posts.push(post);
-
-            const error=false;
-
-            if(!error){
-                resolve();
-            }
-            else{
-                reject("Error: Somthing went wrong");
-            }
-        },2000);
+function updateLastUserActivityTime() {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            lastActivityTime = new Date().toLocaleTimeString();
+            resolve(lastActivityTime);
+        }, 1000);
     });
 }
 
-// createPost({title:"Post Three",body:"This is post three"})
-// .then(getPosts);
+function createPost(post) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            posts.push(post);
 
-// Promise.all
+            const error = false;
 
-const promise1=Promise.resolve("Hello World");
-const promise2=10;
-const promise3=new Promise((resolve,reject)=>
-setTimeout(resolve,2000,"Goodbye")
-);
+            if (!error) {
+                resolve();
+            } else {
+                reject("Error: Something went wrong");
+            }
+        }, 2000);
+    });
+}
 
-Promise.all([promise1,promise2,promise3]).then(values=>console.log(values));
+Promise.all([createPost({ title: 'Post Three', body: 'This is Post Three' }), updateLastUserActivityTime()],
+            [createPost({ title: 'Post Four', body: 'This is Post Four' }), updateLastUserActivityTime()])
+    .then(() => getPosts()) // Update the posts on the page after creating and updating activity time
+    // .then(() => getPosts()) // Update the posts on the page after deleting a post
+    .catch((error) => console.error(error));
